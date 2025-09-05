@@ -3,11 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Resume Editor - Anubh <button class="btn" onclick="exportResume()">Export
-      as HTML</button> <button class="btn" onclick="generatePDF()">Download
-      PDF</button> Choubey
-    </title>
+    <title>Resume Editor - Anubhav Choubey</title>
     <style>
       /* Base Resume Styles */
       .resume-container {
@@ -65,31 +61,98 @@
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
+        display: flex;
+        height: 100vh;
       }
 
-      .editor-header {
+      /* Sidebar Styles */
+      .sidebar {
+        width: 300px;
         background-color: #2c3e50;
         color: white;
         padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .sidebar h1 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 24px;
         text-align: center;
       }
 
-      .editor-controls {
-        background-color: #34495e;
-        padding: 15px;
+      .sidebar p {
+        margin-bottom: 20px;
+        font-size: 14px;
+        line-height: 1.4;
         text-align: center;
+      }
+
+      /* Job Description Section */
+      .job-description-section {
+        margin-bottom: 25px;
+        padding: 15px;
+        background-color: #34495e;
+        border-radius: 8px;
+      }
+
+      .job-description-section h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: #ecf0f1;
+      }
+
+      .job-textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        resize: vertical;
+        box-sizing: border-box;
+        background-color: #ecf0f1;
+        color: #2c3e50;
+      }
+
+      .job-textarea:focus {
+        outline: 2px solid #3498db;
+      }
+
+      /* Controls Section */
+      .controls-section {
+        margin-bottom: 20px;
+      }
+
+      .controls-section h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #ecf0f1;
+        border-bottom: 1px solid #34495e;
+        padding-bottom: 5px;
       }
 
       .btn {
         background-color: #3498db;
         color: white;
         border: none;
-        padding: 10px 20px;
-        margin: 0 5px;
+        padding: 12px 16px;
+        margin: 5px 0;
         border-radius: 5px;
         cursor: pointer;
         font-size: 14px;
         transition: background-color 0.3s;
+        width: 100%;
+        text-align: center;
       }
 
       .btn:hover {
@@ -110,6 +173,109 @@
 
       .btn.save:hover {
         background-color: #229954;
+      }
+
+      .btn.warning {
+        background-color: #f39c12;
+      }
+
+      .btn.warning:hover {
+        background-color: #e67e22;
+      }
+
+      /* Main Content Area */
+      .main-content {
+        margin-left: 300px;
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        height: 100vh;
+        box-sizing: border-box;
+        background-color: #f5f5f5;
+      }
+
+      /* A4 Page Container */
+      .a4-page-container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+
+      .a4-page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto 20px auto;
+        padding: 20mm;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 0;
+        box-sizing: border-box;
+        font-family: "Calibri", sans-serif;
+        font-size: 12pt;
+        color: #111;
+        page-break-after: always;
+        position: relative;
+      }
+
+      .a4-page:last-child {
+        margin-bottom: 0;
+      }
+
+      .a4-page h1 {
+        text-align: center;
+        font-size: 22pt;
+        margin-bottom: 5px;
+        margin-top: 0;
+      }
+
+      .a4-page .contact,
+      .a4-page .links {
+        text-align: center;
+        font-size: 10.5pt;
+        margin-bottom: 5px;
+      }
+
+      .a4-page hr {
+        border: none;
+        border-top: 1px solid #444;
+        margin: 15px 0;
+      }
+
+      .a4-page h2 {
+        font-size: 13pt;
+        margin-top: 20px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 3px;
+      }
+
+      .a4-page .job-title {
+        font-weight: bold;
+      }
+
+      .a4-page .date {
+        float: right;
+        font-style: italic;
+      }
+
+      .a4-page ul {
+        margin: 4px 0 10px 20px;
+      }
+
+      .a4-page li {
+        margin-bottom: 4px;
+      }
+
+      /* Page break helpers */
+      .page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+
+      .no-break {
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
 
       /* Editable content styles */
@@ -141,25 +307,60 @@
         text-align: center;
         position: fixed;
         bottom: 0;
-        width: 100%;
+        left: 300px;
+        right: 0;
         font-size: 14px;
+        z-index: 999;
       }
 
       .hidden {
         display: none;
       }
 
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+
+        .status-bar {
+          left: 0;
+        }
+      }
+
       /* Print styles */
       @media print {
-        .editor-header,
-        .editor-controls,
+        .sidebar,
         .status-bar {
           display: none;
         }
-        .resume-container {
+
+        .main-content {
+          margin-left: 0;
+          padding: 0;
+          background: white;
+        }
+
+        .a4-page-container {
+          background: white;
+        }
+
+        .a4-page {
           box-shadow: none;
           margin: 0;
-          padding: 20px;
+          width: 100%;
+          min-height: 100vh;
+          page-break-after: always;
+        }
+
+        .a4-page:last-child {
+          page-break-after: avoid;
         }
       }
 
@@ -182,245 +383,482 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   </head>
   <body>
-    <div class="editor-header">
-      <h1>Resume Content Editor</h1>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h1>Resume Editor</h1>
       <p>
         Click on any text in the resume to edit it. The format will remain
         unchanged.
       </p>
+
+      <!-- Job Description Section -->
+      <div class="job-description-section">
+        <h3>Job Description</h3>
+        <textarea
+          class="job-textarea"
+          id="jobDescription"
+          placeholder="Paste the job description here to tailor your resume..."
+        ></textarea>
+        <button class="btn" onclick="updateWithAI()" style="margin-top: 10px">
+          Update with AI for Job Description
+        </button>
+      </div>
+
+      <!-- Controls Section -->
+      <div class="controls-section">
+        <h3>Edit Controls</h3>
+        <button class="btn" id="editModeBtn" onclick="toggleEditMode()">
+          Enable Edit Mode
+        </button>
+        <button class="btn save" onclick="saveChanges()">Save Changes</button>
+      </div>
+
+      <div class="controls-section">
+        <h3>Export Options</h3>
+        <button class="btn" onclick="generatePDF()">Download PDF</button>
+      </div>
     </div>
 
-    <div class="editor-controls">
-      <button class="btn" id="editModeBtn" onclick="toggleEditMode()">
-        Enable Edit Mode
-      </button>
-      <button class="btn save" onclick="saveChanges()">Save Changes</button>
-      <button class="btn" onclick="loadChanges()">Load Saved</button>
-      <button class="btn" onclick="resetToDefault()">Reset to Default</button>
-      <button class="btn" onclick="exportResume()">Export as HTML</button>
-      <button class="btn" onclick="generatePDF()">Download PDF</button>
-    </div>
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <div class="a4-page-container" id="resumeContainer">
+        <!-- Page 1 -->
+        <div class="a4-page" id="page1">
+          <!-- Header -->
+          <h1 class="editable" data-field="name">Anubhav Choubey</h1>
+          <div class="contact editable" data-field="contact">
+            +91 9131XXXXXX | choubey.anubhav253@gmail.com | anubhavchoubey.com
+          </div>
+          <div class="links editable" data-field="links">
+            GitHub | LinkedIn | Kaggle | Jabalpur, Madhya Pradesh
+          </div>
+          <hr />
 
-    <div class="resume-container" id="resumeContainer">
-      <!-- Header -->
-      <h1 class="editable" data-field="name">Anubhav Choubey</h1>
-      <div class="contact editable" data-field="contact">
-        +91 9131XXXXXX | choubey.anubhav253@gmail.com | anubhavchoubey.com
+          <!-- Experience -->
+          <h2>Experience</h2>
+
+          <div class="no-break">
+            <p>
+              <span class="job-title editable" data-field="job1-title"
+                >Technical Intern @ Rozana.in (Onsite)</span
+              >
+              <span class="date editable" data-field="job1-date">Jul 2025 – Present</span>
+            </p>
+            <ul>
+              <li class="editable" data-field="job1-desc1">
+                Built a pipeline for automated image generation and editing using SOTA
+                open-source models (Flux Krea Dev, Qwen Image Edit, Vision LLMs).
+              </li>
+              <li class="editable" data-field="job1-desc2">
+                Automated generation of display names, descriptions, and visual tags
+                using Gemini API, and optimized Typesense queries for improved search
+                relevance.
+              </li>
+              <li class="editable" data-field="job1-desc3">
+                Developed a pipeline to fetch, process, and deploy geofencing data for
+                store coverage areas, enabling seamless production integration.
+              </li>
+            </ul>
+          </div>
+
+          <div class="no-break">
+            <p>
+              <span class="job-title editable" data-field="job2-title"
+                >Deep Learning Intern @ Devnex Technologies</span
+              >
+              <span class="date editable" data-field="job2-date">Sep 2024 – Jul 2025</span>
+            </p>
+            <ul>
+              <li class="editable" data-field="job2-desc1">
+                Deployed open-source models (Flux, Flux Kontext, InternVL, Gemma,
+                etc.) on HuggingFace Endpoints and Modal.com with quantized versions
+                for efficient remote execution.
+              </li>
+              <li class="editable" data-field="job2-desc2">
+                Optimized model performance by reducing memory usage and runtime
+                through parallel processing, multithreading, and pipelining.
+              </li>
+              <li class="editable" data-field="job2-desc3">
+                Collaborated in professional environments using ticket-based systems,
+                Git workflows, and maintained thorough code documentation.
+              </li>
+            </ul>
+          </div>
+
+          <div class="no-break">
+            <p>
+              <span class="job-title editable" data-field="job3-title"
+                >Intern @ Lexi.ai</span
+              >
+              <span class="date editable" data-field="job3-date">May 2024 – Jun 2025</span>
+            </p>
+            <ul>
+              <li class="editable" data-field="job3-desc1">
+                Developed a Django backend with a web-hosted SQL database, including
+                MySQL schema design and robust validation for accurate data
+                transmission.
+              </li>
+              <li class="editable" data-field="job3-desc2">
+                Contributed to website basic frontend development using HTML, CSS, JS
+                (React).
+              </li>
+            </ul>
+          </div>
+
+          <div class="no-break">
+            <p>
+              <span class="job-title editable" data-field="job4-title"
+                >Freelancer</span
+              >
+              <span class="date editable" data-field="job4-date">Sep 2023 – Sep 2024</span>
+            </p>
+            <ul>
+              <li class="editable" data-field="job4-desc1">
+                Completed 15+ projects spanning Python, FastAPI, Django, Machine
+                Learning, automation, and various Python frameworks.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Page 2 -->
+        <div class="a4-page page-break" id="page2">
+          <!-- Projects -->
+          <h2>Projects</h2>
+
+          <div class="no-break">
+            <p>
+              <span class="job-title editable" data-field="project1-title"
+                >School Sphere – School Management System</span
+              >
+              <span class="date editable" data-field="project1-tech"
+                >(Python, FastAPI, Celery, Redis, JWT)</span
+              >
+            </p>
+            <ul>
+              <li class="editable" data-field="project1-desc1">
+                Engineered a secure backend with JWT-based authentication and
+                multi-role access control, ensuring safe request handling and granular
+                read/write permissions.
+              </li>
+              <li class="editable" data-field="project1-desc2">
+                Optimized performance using Redis-based class-level caching, Celery
+                for task scheduling, and multithreading to reduce redundant processing
+                and improve scalability.
+              </li>
+              <li class="editable" data-field="project1-desc3">
+                Followed industry best practices (logging, lazy loading, exception
+                handling) while building with Python, FastAPI, Redis, Celery, and JWT
+                for a production-ready system.
+              </li>
+            </ul>
+          </div>
+
+          <div class="no-break">
+            <p>
+              <span class="job-title editable" data-field="project2-title"
+                >Gesture Controlled Virtual Assistant</span
+              >
+              <span class="date editable" data-field="project2-tech"
+                >(OpenCV, Python, MediaPipe, NumPy)</span
+              >
+            </p>
+            <ul>
+              <li class="editable" data-field="project2-desc1">
+                Created a virtual assistant that uses gesture control for hands-free
+                computer interaction.
+              </li>
+              <li class="editable" data-field="project2-desc2">
+                Incorporated facial and hand filters to enhance the representation of
+                the subject.
+              </li>
+            </ul>
+          </div>
+
+          <div class="no-break">
+            <p>
+              <span class="job-title editable" data-field="project3-title"
+                >Chess AI</span
+              >
+              <span class="date editable" data-field="project3-tech"
+                >(Python, PyGame, Minimax Algorithm, AI, Parallel Programming)</span
+              >
+            </p>
+            <ul>
+              <li class="editable" data-field="project3-desc1">
+                Built a Chess game with an AI opponent (~1000 ELO) using Python,
+                PyGame, and the Minimax algorithm.
+              </li>
+              <li class="editable" data-field="project3-desc2">
+                Optimized AI performance with parallel processing, multithreading, and
+                best coding practices.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Skills -->
+          <h2>Skills</h2>
+          <p class="editable" data-field="skills-languages">
+            <b>Languages & Frameworks:</b> Python, Django, FastAPI, SQL
+          </p>
+          <p class="editable" data-field="skills-ai">
+            <b>AI/ML & Deep Learning:</b> Prompting, ComfyUI, Pipelining, HuggingFace,
+            CV, NLP, OpenCV, Inferencing
+          </p>
+          <p class="editable" data-field="skills-data">
+            <b>Data Handling:</b> MySQL, SQLAlchemy, Pandas, NumPy, BeautifulSoup4,
+            Firebase, REST APIs, Webhooks
+          </p>
+          <p class="editable" data-field="skills-cloud">
+            <b>Cloud & Deployment:</b> HuggingFace Endpoints, AWS, Linux, Docker
+          </p>
+          <p class="editable" data-field="skills-tools">
+            <b>Tools & Automation:</b> Selenium, Git, GitHub
+          </p>
+
+          <!-- Education -->
+          <h2>Education</h2>
+          <p class="editable" data-field="education-btech">
+            <b>B.Tech (Artificial Intelligence and Data Science):</b> JEC (Est. 1947)
+            – 8.4* <span class="date">Jul 2022 – Apr 2026</span>
+          </p>
+          <p class="editable" data-field="education-cbse">
+            <b>CBSE (Senior Secondary Education):</b> KVOFK – 92.2%
+            <span class="date">Apr 2021 – Jul 2022</span>
+          </p>
+
+          <!-- Accomplishments -->
+          <h2>Accomplishments</h2>
+          <ul>
+            <li class="editable" data-field="accomplish1">
+              Led 'Team Conquerors!' to SIH'24 Finals.
+            </li>
+            <li class="editable" data-field="accomplish2">
+              LeetCode: Solved 200+ problems in Data Structures and Algorithms.
+            </li>
+            <li class="editable" data-field="accomplish3">
+              Led the winning team at CodeKumbh Hackathon, showcasing leadership and
+              teamwork skills.
+            </li>
+            <li class="editable" data-field="accomplish4">
+              Team leader for a Top 4 project at the HackCrux Hackathon.
+            </li>
+            <li class="editable" data-field="accomplish5">
+              Built and manage a coding-focused YouTube channel with 9K+ subscribers
+              and 2.5M+ total views.
+            </li>
+            <li class="editable" data-field="accomplish6">
+              Certifications: Python, AI, ML, Technical Support Fundamentals
+              (Coursera).
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="links editable" data-field="links">
-        GitHub | LinkedIn | Kaggle | Jabalpur, Madhya Pradesh
+          >
+          <span class="date editable" data-field="job1-date"
+            >Jul 2025 – Present</span
+          >
+        </p>
+        <ul>
+          <li class="editable" data-field="job1-desc1">
+            Built a pipeline for automated image generation and editing using
+            SOTA open-source models (Flux Krea Dev, Qwen Image Edit, Vision
+            LLMs).
+          </li>
+          <li class="editable" data-field="job1-desc2">
+            Automated generation of display names, descriptions, and visual tags
+            using Gemini API, and optimized Typesense queries for improved
+            search relevance.
+          </li>
+          <li class="editable" data-field="job1-desc3">
+            Developed a pipeline to fetch, process, and deploy geofencing data
+            for store coverage areas, enabling seamless production integration.
+          </li>
+        </ul>
+
+        <p>
+          <span class="job-title editable" data-field="job2-title"
+            >Deep Learning Intern @ Devnex Technologies</span
+          >
+          <span class="date editable" data-field="job2-date"
+            >Sep 2024 – Jul 2025</span
+          >
+        </p>
+        <ul>
+          <li class="editable" data-field="job2-desc1">
+            Deployed open-source models (Flux, Flux Kontext, InternVL, Gemma,
+            etc.) on HuggingFace Endpoints and Modal.com with quantized versions
+            for efficient remote execution.
+          </li>
+          <li class="editable" data-field="job2-desc2">
+            Optimized model performance by reducing memory usage and runtime
+            through parallel processing, multithreading, and pipelining.
+          </li>
+          <li class="editable" data-field="job2-desc3">
+            Collaborated in professional environments using ticket-based
+            systems, Git workflows, and maintained thorough code documentation.
+          </li>
+        </ul>
+
+        <p>
+          <span class="job-title editable" data-field="job3-title"
+            >Intern @ Lexi.ai</span
+          >
+          <span class="date editable" data-field="job3-date"
+            >May 2024 – Jun 2025</span
+          >
+        </p>
+        <ul>
+          <li class="editable" data-field="job3-desc1">
+            Developed a Django backend with a web-hosted SQL database, including
+            MySQL schema design and robust validation for accurate data
+            transmission.
+          </li>
+          <li class="editable" data-field="job3-desc2">
+            Contributed to website basic frontend development using HTML, CSS,
+            JS (React).
+          </li>
+        </ul>
+
+        <p>
+          <span class="job-title editable" data-field="job4-title"
+            >Freelancer</span
+          >
+          <span class="date editable" data-field="job4-date"
+            >Sep 2023 – Sep 2024</span
+          >
+        </p>
+        <ul>
+          <li class="editable" data-field="job4-desc1">
+            Completed 15+ projects spanning Python, FastAPI, Django, Machine
+            Learning, automation, and various Python frameworks.
+          </li>
+        </ul>
+
+        <!-- Projects -->
+        <h2>Projects</h2>
+
+        <p>
+          <span class="job-title editable" data-field="project1-title"
+            >School Sphere – School Management System</span
+          >
+          <span class="date editable" data-field="project1-tech"
+            >(Python, FastAPI, Celery, Redis, JWT)</span
+          >
+        </p>
+        <ul>
+          <li class="editable" data-field="project1-desc1">
+            Engineered a secure backend with JWT-based authentication and
+            multi-role access control, ensuring safe request handling and
+            granular read/write permissions.
+          </li>
+          <li class="editable" data-field="project1-desc2">
+            Optimized performance using Redis-based class-level caching, Celery
+            for task scheduling, and multithreading to reduce redundant
+            processing and improve scalability.
+          </li>
+          <li class="editable" data-field="project1-desc3">
+            Followed industry best practices (logging, lazy loading, exception
+            handling) while building with Python, FastAPI, Redis, Celery, and
+            JWT for a production-ready system.
+          </li>
+        </ul>
+
+        <p>
+          <span class="job-title editable" data-field="project2-title"
+            >Gesture Controlled Virtual Assistant</span
+          >
+          <span class="date editable" data-field="project2-tech"
+            >(OpenCV, Python, MediaPipe, NumPy)</span
+          >
+        </p>
+        <ul>
+          <li class="editable" data-field="project2-desc1">
+            Created a virtual assistant that uses gesture control for hands-free
+            computer interaction.
+          </li>
+          <li class="editable" data-field="project2-desc2">
+            Incorporated facial and hand filters to enhance the representation
+            of the subject.
+          </li>
+        </ul>
+
+        <p>
+          <span class="job-title editable" data-field="project3-title"
+            >Chess AI</span
+          >
+          <span class="date editable" data-field="project3-tech"
+            >(Python, PyGame, Minimax Algorithm, AI, Parallel Programming)</span
+          >
+        </p>
+        <ul>
+          <li class="editable" data-field="project3-desc1">
+            Built a Chess game with an AI opponent (~1000 ELO) using Python,
+            PyGame, and the Minimax algorithm.
+          </li>
+          <li class="editable" data-field="project3-desc2">
+            Optimized AI performance with parallel processing, multithreading,
+            and best coding practices.
+          </li>
+        </ul>
+
+        <!-- Skills -->
+        <h2>Skills</h2>
+        <p class="editable" data-field="skills-languages">
+          <b>Languages & Frameworks:</b> Python, Django, FastAPI, SQL
+        </p>
+        <p class="editable" data-field="skills-ai">
+          <b>AI/ML & Deep Learning:</b> Prompting, ComfyUI, Pipelining,
+          HuggingFace, CV, NLP, OpenCV, Inferencing
+        </p>
+        <p class="editable" data-field="skills-data">
+          <b>Data Handling:</b> MySQL, SQLAlchemy, Pandas, NumPy,
+          BeautifulSoup4, Firebase, REST APIs, Webhooks
+        </p>
+        <p class="editable" data-field="skills-cloud">
+          <b>Cloud & Deployment:</b> HuggingFace Endpoints, AWS, Linux, Docker
+        </p>
+        <p class="editable" data-field="skills-tools">
+          <b>Tools & Automation:</b> Selenium, Git, GitHub
+        </p>
+
+        <!-- Education -->
+        <h2>Education</h2>
+        <p class="editable" data-field="education-btech">
+          <b>B.Tech (Artificial Intelligence and Data Science):</b> JEC (Est.
+          1947) – 8.4* <span class="date">Jul 2022 – Apr 2026</span>
+        </p>
+        <p class="editable" data-field="education-cbse">
+          <b>CBSE (Senior Secondary Education):</b> KVOFK – 92.2%
+          <span class="date">Apr 2021 – Jul 2022</span>
+        </p>
+
+        <!-- Accomplishments -->
+        <h2>Accomplishments</h2>
+        <ul>
+          <li class="editable" data-field="accomplish1">
+            Led 'Team Conquerors!' to SIH'24 Finals.
+          </li>
+          <li class="editable" data-field="accomplish2">
+            LeetCode: Solved 200+ problems in Data Structures and Algorithms.
+          </li>
+          <li class="editable" data-field="accomplish3">
+            Led the winning team at CodeKumbh Hackathon, showcasing leadership
+            and teamwork skills.
+          </li>
+          <li class="editable" data-field="accomplish4">
+            Team leader for a Top 4 project at the HackCrux Hackathon.
+          </li>
+          <li class="editable" data-field="accomplish5">
+            Built and manage a coding-focused YouTube channel with 9K+
+            subscribers and 2.5M+ total views.
+          </li>
+          <li class="editable" data-field="accomplish6">
+            Certifications: Python, AI, ML, Technical Support Fundamentals
+            (Coursera).
+          </li>
+        </ul>
       </div>
-      <hr />
-
-      <!-- Experience -->
-      <h2>Experience</h2>
-
-      <p>
-        <span class="job-title editable" data-field="job1-title"
-          >Technical Intern @ Rozana.in (Onsite)</span
-        >
-        <span class="date editable" data-field="job1-date"
-          >Jul 2025 – Present</span
-        >
-      </p>
-      <ul>
-        <li class="editable" data-field="job1-desc1">
-          Built a pipeline for automated image generation and editing using SOTA
-          open-source models (Flux Krea Dev, Qwen Image Edit, Vision LLMs).
-        </li>
-        <li class="editable" data-field="job1-desc2">
-          Automated generation of display names, descriptions, and visual tags
-          using Gemini API, and optimized Typesense queries for improved search
-          relevance.
-        </li>
-        <li class="editable" data-field="job1-desc3">
-          Developed a pipeline to fetch, process, and deploy geofencing data for
-          store coverage areas, enabling seamless production integration.
-        </li>
-      </ul>
-
-      <p>
-        <span class="job-title editable" data-field="job2-title"
-          >Deep Learning Intern @ Devnex Technologies</span
-        >
-        <span class="date editable" data-field="job2-date"
-          >Sep 2024 – Jul 2025</span
-        >
-      </p>
-      <ul>
-        <li class="editable" data-field="job2-desc1">
-          Deployed open-source models (Flux, Flux Kontext, InternVL, Gemma,
-          etc.) on HuggingFace Endpoints and Modal.com with quantized versions
-          for efficient remote execution.
-        </li>
-        <li class="editable" data-field="job2-desc2">
-          Optimized model performance by reducing memory usage and runtime
-          through parallel processing, multithreading, and pipelining.
-        </li>
-        <li class="editable" data-field="job2-desc3">
-          Collaborated in professional environments using ticket-based systems,
-          Git workflows, and maintained thorough code documentation.
-        </li>
-      </ul>
-
-      <p>
-        <span class="job-title editable" data-field="job3-title"
-          >Intern @ Lexi.ai</span
-        >
-        <span class="date editable" data-field="job3-date"
-          >May 2024 – Jun 2025</span
-        >
-      </p>
-      <ul>
-        <li class="editable" data-field="job3-desc1">
-          Developed a Django backend with a web-hosted SQL database, including
-          MySQL schema design and robust validation for accurate data
-          transmission.
-        </li>
-        <li class="editable" data-field="job3-desc2">
-          Contributed to website basic frontend development using HTML, CSS, JS
-          (React).
-        </li>
-      </ul>
-
-      <p>
-        <span class="job-title editable" data-field="job4-title"
-          >Freelancer</span
-        >
-        <span class="date editable" data-field="job4-date"
-          >Sep 2023 – Sep 2024</span
-        >
-      </p>
-      <ul>
-        <li class="editable" data-field="job4-desc1">
-          Completed 15+ projects spanning Python, FastAPI, Django, Machine
-          Learning, automation, and various Python frameworks.
-        </li>
-      </ul>
-
-      <!-- Projects -->
-      <h2>Projects</h2>
-
-      <p>
-        <span class="job-title editable" data-field="project1-title"
-          >School Sphere – School Management System</span
-        >
-        <span class="date editable" data-field="project1-tech"
-          >(Python, FastAPI, Celery, Redis, JWT)</span
-        >
-      </p>
-      <ul>
-        <li class="editable" data-field="project1-desc1">
-          Engineered a secure backend with JWT-based authentication and
-          multi-role access control, ensuring safe request handling and granular
-          read/write permissions.
-        </li>
-        <li class="editable" data-field="project1-desc2">
-          Optimized performance using Redis-based class-level caching, Celery
-          for task scheduling, and multithreading to reduce redundant processing
-          and improve scalability.
-        </li>
-        <li class="editable" data-field="project1-desc3">
-          Followed industry best practices (logging, lazy loading, exception
-          handling) while building with Python, FastAPI, Redis, Celery, and JWT
-          for a production-ready system.
-        </li>
-      </ul>
-
-      <p>
-        <span class="job-title editable" data-field="project2-title"
-          >Gesture Controlled Virtual Assistant</span
-        >
-        <span class="date editable" data-field="project2-tech"
-          >(OpenCV, Python, MediaPipe, NumPy)</span
-        >
-      </p>
-      <ul>
-        <li class="editable" data-field="project2-desc1">
-          Created a virtual assistant that uses gesture control for hands-free
-          computer interaction.
-        </li>
-        <li class="editable" data-field="project2-desc2">
-          Incorporated facial and hand filters to enhance the representation of
-          the subject.
-        </li>
-      </ul>
-
-      <p>
-        <span class="job-title editable" data-field="project3-title"
-          >Chess AI</span
-        >
-        <span class="date editable" data-field="project3-tech"
-          >(Python, PyGame, Minimax Algorithm, AI, Parallel Programming)</span
-        >
-      </p>
-      <ul>
-        <li class="editable" data-field="project3-desc1">
-          Built a Chess game with an AI opponent (~1000 ELO) using Python,
-          PyGame, and the Minimax algorithm.
-        </li>
-        <li class="editable" data-field="project3-desc2">
-          Optimized AI performance with parallel processing, multithreading, and
-          best coding practices.
-        </li>
-      </ul>
-
-      <!-- Skills -->
-      <h2>Skills</h2>
-      <p class="editable" data-field="skills-languages">
-        <b>Languages & Frameworks:</b> Python, Django, FastAPI, SQL
-      </p>
-      <p class="editable" data-field="skills-ai">
-        <b>AI/ML & Deep Learning:</b> Prompting, ComfyUI, Pipelining,
-        HuggingFace, CV, NLP, OpenCV, Inferencing
-      </p>
-      <p class="editable" data-field="skills-data">
-        <b>Data Handling:</b> MySQL, SQLAlchemy, Pandas, NumPy, BeautifulSoup4,
-        Firebase, REST APIs, Webhooks
-      </p>
-      <p class="editable" data-field="skills-cloud">
-        <b>Cloud & Deployment:</b> HuggingFace Endpoints, AWS, Linux, Docker
-      </p>
-      <p class="editable" data-field="skills-tools">
-        <b>Tools & Automation:</b> Selenium, Git, GitHub
-      </p>
-
-      <!-- Education -->
-      <h2>Education</h2>
-      <p class="editable" data-field="education-btech">
-        <b>B.Tech (Artificial Intelligence and Data Science):</b> JEC (Est.
-        1947) – 8.4* <span class="date">Jul 2022 – Apr 2026</span>
-      </p>
-      <p class="editable" data-field="education-cbse">
-        <b>CBSE (Senior Secondary Education):</b> KVOFK – 92.2%
-        <span class="date">Apr 2021 – Jul 2022</span>
-      </p>
-
-      <!-- Accomplishments -->
-      <h2>Accomplishments</h2>
-      <ul>
-        <li class="editable" data-field="accomplish1">
-          Led 'Team Conquerors!' to SIH'24 Finals.
-        </li>
-        <li class="editable" data-field="accomplish2">
-          LeetCode: Solved 200+ problems in Data Structures and Algorithms.
-        </li>
-        <li class="editable" data-field="accomplish3">
-          Led the winning team at CodeKumbh Hackathon, showcasing leadership and
-          teamwork skills.
-        </li>
-        <li class="editable" data-field="accomplish4">
-          Team leader for a Top 4 project at the HackCrux Hackathon.
-        </li>
-        <li class="editable" data-field="accomplish5">
-          Built and manage a coding-focused YouTube channel with 9K+ subscribers
-          and 2.5M+ total views.
-        </li>
-        <li class="editable" data-field="accomplish6">
-          Certifications: Python, AI, ML, Technical Support Fundamentals
-          (Coursera).
-        </li>
-      </ul>
     </div>
 
     <div class="status-bar" id="statusBar">
@@ -518,130 +956,6 @@
         }, 2000);
       }
 
-      // Load changes from localStorage
-      function loadChanges() {
-        const savedData = localStorage.getItem("resumeData");
-        if (savedData) {
-          const data = JSON.parse(savedData);
-
-          Object.keys(data).forEach((field) => {
-            const element = document.querySelector(`[data-field="${field}"]`);
-            if (element) {
-              element.innerHTML = data[field];
-            }
-          });
-
-          const statusBar = document.getElementById("statusBar");
-          statusBar.textContent = "Saved changes loaded successfully!";
-          setTimeout(() => {
-            statusBar.textContent = editMode
-              ? "Edit Mode: ON - Click on any text to edit it."
-              : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
-          }, 2000);
-        } else {
-          alert("No saved changes found.");
-        }
-      }
-
-      // Reset to default content
-      function resetToDefault() {
-        if (confirm("Are you sure you want to reset all content to default?")) {
-          Object.keys(originalContent).forEach((field) => {
-            const element = document.querySelector(`[data-field="${field}"]`);
-            if (element) {
-              element.innerHTML = originalContent[field];
-            }
-          });
-
-          const statusBar = document.getElementById("statusBar");
-          statusBar.textContent = "Content reset to default!";
-          setTimeout(() => {
-            statusBar.textContent = editMode
-              ? "Edit Mode: ON - Click on any text to edit it."
-              : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
-          }, 2000);
-        }
-      }
-
-      // Export resume as HTML
-      function exportResume() {
-        const resumeContainer = document.getElementById("resumeContainer");
-        const originalHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Anubhav Choubey - Resume</title>
-  <style>
-    body {
-      font-family: "Calibri", sans-serif;
-      margin: 40px;
-      font-size: 12pt;
-      color: #111;
-    }
-    h1 {
-      text-align: center;
-      font-size: 22pt;
-      margin-bottom: 5px;
-    }
-    .contact, .links {
-      text-align: center;
-      font-size: 10.5pt;
-      margin-bottom: 5px;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid #444;
-      margin: 15px 0;
-    }
-    h2 {
-      font-size: 13pt;
-      margin-top: 20px;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 3px;
-    }
-    .job-title {
-      font-weight: bold;
-    }
-    .date {
-      float: right;
-      font-style: italic;
-    }
-    ul {
-      margin: 4px 0 10px 20px;
-    }
-    li {
-      margin-bottom: 4px;
-    }
-  </style>
-</head>
-<body>
-${resumeContainer.innerHTML
-  .replace(/class="[^"]*editable[^"]*"/g, "")
-  .replace(/data-field="[^"]*"/g, "")
-  .replace(/contenteditable="[^"]*"/g, "")}
-</body>
-</html>`;
-
-        const blob = new Blob([originalHTML], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "resume.html";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        const statusBar = document.getElementById("statusBar");
-        statusBar.textContent = "Resume exported as HTML file!";
-        setTimeout(() => {
-          statusBar.textContent = editMode
-            ? "Edit Mode: ON - Click on any text to edit it."
-            : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
-        }, 2000);
-      }
-
       // Generate PDF using html2pdf.js
       function generatePDF() {
         const element = document.getElementById("resumeContainer");
@@ -664,21 +978,24 @@ ${resumeContainer.innerHTML
         // Remove edit mode styling
         clonedElement.classList.remove("edit-mode-active");
 
-        // Configure html2pdf options
+        // Configure html2pdf options for A4 pages
         const opt = {
-          margin: [0.5, 0.5, 0.5, 0.5], // top, left, bottom, right in inches
+          margin: [0, 0, 0, 0], // No margins since we handle them in CSS
           filename: "Resume_Anubhav_Choubey.pdf",
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: {
             scale: 2,
             useCORS: true,
             letterRendering: true,
+            width: 210 * 3.779, // A4 width in pixels (210mm * 3.779 pixels/mm)
+            height: 297 * 3.779, // A4 height in pixels (297mm * 3.779 pixels/mm)
           },
           jsPDF: {
-            unit: "in",
+            unit: "mm",
             format: "a4",
             orientation: "portrait",
           },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         // Generate PDF
@@ -705,9 +1022,194 @@ ${resumeContainer.innerHTML
           });
       }
 
+      // Update with AI for Job Description
+      function updateWithAI() {
+        const jobDescription = document
+          .getElementById("jobDescription")
+          .value.trim();
+        const statusBar = document.getElementById("statusBar");
+
+        if (!jobDescription) {
+          statusBar.textContent = "Please enter a job description first.";
+          setTimeout(() => {
+            statusBar.textContent = editMode
+              ? "Edit Mode: ON - Click on any text to edit it."
+              : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+          }, 3000);
+          return;
+        }
+
+        statusBar.textContent =
+          "Analyzing job description... (Feature coming soon!)";
+
+        // TODO: Implement job description analysis
+        setTimeout(() => {
+          statusBar.textContent =
+            "Job analysis complete! Check console for details.";
+          console.log("Job Description Analysis:", {
+            description: jobDescription,
+            keywords: extractKeywords(jobDescription),
+            skills: extractSkills(jobDescription),
+          });
+
+          setTimeout(() => {
+            statusBar.textContent = editMode
+              ? "Edit Mode: ON - Click on any text to edit it."
+              : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+          }, 3000);
+        }, 2000);
+      }
+
+      function suggestImprovements() {
+        const statusBar = document.getElementById("statusBar");
+        const jobDescription = document
+          .getElementById("jobDescription")
+          .value.trim();
+
+        statusBar.textContent =
+          "Generating improvement suggestions... (Feature coming soon!)";
+
+        // TODO: Implement AI-powered suggestions
+        setTimeout(() => {
+          statusBar.textContent =
+            "Suggestions generated! Check console for details.";
+          console.log("Resume Improvement Suggestions:", {
+            hasJobDescription: !!jobDescription,
+            suggestions: [
+              "Add more quantifiable achievements",
+              "Include relevant keywords from job description",
+              "Optimize bullet points for ATS systems",
+            ],
+          });
+
+          setTimeout(() => {
+            statusBar.textContent = editMode
+              ? "Edit Mode: ON - Click on any text to edit it."
+              : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+          }, 3000);
+        }, 2000);
+      }
+
+      // Helper functions for job analysis
+      function extractKeywords(text) {
+        const commonWords = [
+          "the",
+          "and",
+          "or",
+          "but",
+          "in",
+          "on",
+          "at",
+          "to",
+          "for",
+          "of",
+          "with",
+          "by",
+          "is",
+          "are",
+          "was",
+          "were",
+          "be",
+          "been",
+          "being",
+          "have",
+          "has",
+          "had",
+          "do",
+          "does",
+          "did",
+          "will",
+          "would",
+          "should",
+          "could",
+          "may",
+          "might",
+          "must",
+          "shall",
+          "can",
+          "this",
+          "that",
+          "these",
+          "those",
+          "a",
+          "an",
+        ];
+
+        return text
+          .toLowerCase()
+          .replace(/[^\w\s]/g, " ")
+          .split(/\s+/)
+          .filter((word) => word.length > 3 && !commonWords.includes(word))
+          .reduce((acc, word) => {
+            acc[word] = (acc[word] || 0) + 1;
+            return acc;
+          }, {});
+      }
+
+      function extractSkills(text) {
+        const skillKeywords = [
+          "python",
+          "javascript",
+          "react",
+          "node",
+          "sql",
+          "aws",
+          "docker",
+          "kubernetes",
+          "machine learning",
+          "ai",
+          "artificial intelligence",
+          "data science",
+          "analytics",
+          "api",
+          "rest",
+          "graphql",
+          "mongodb",
+          "postgresql",
+          "mysql",
+          "redis",
+          "git",
+          "github",
+          "agile",
+          "scrum",
+          "ci/cd",
+          "devops",
+        ];
+
+        const foundSkills = [];
+        const textLower = text.toLowerCase();
+
+        skillKeywords.forEach((skill) => {
+          if (textLower.includes(skill)) {
+            foundSkills.push(skill);
+          }
+        });
+
+        return foundSkills;
+      }
+
+      // Save job description to localStorage
+      function saveJobDescription() {
+        const jobDescription = document.getElementById("jobDescription").value;
+        localStorage.setItem("jobDescription", jobDescription);
+      }
+
+      // Load job description from localStorage
+      function loadJobDescription() {
+        const savedJobDescription = localStorage.getItem("jobDescription");
+        if (savedJobDescription) {
+          document.getElementById("jobDescription").value = savedJobDescription;
+        }
+      }
+
       // Initialize
       document.addEventListener("DOMContentLoaded", function () {
         storeOriginalContent();
+        loadJobDescription();
+
+        // Auto-save job description on change
+        const jobTextarea = document.getElementById("jobDescription");
+        jobTextarea.addEventListener("input", saveJobDescription);
       });
     </script>
   </body>
