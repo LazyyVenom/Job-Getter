@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Resume Editor - Anubh <button class="btn" onclick="exportResume()">Export
+      as HTML</button> <button class="btn" onclick="generatePDF()">Download
+      PDF</button> Choubey
+    </title>
+    <style>
+      /* Base Resume Styles */
+      .resume-container {
+        font-family: "Calibri", sans-serif;
+        margin: 40px;
+        font-size: 12pt;
+        color: #111;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+      .resume-container h1 {
+        text-align: center;
+        font-size: 22pt;
+        margin-bottom: 5px;
+      }
+      .resume-container .contact,
+      .resume-container .links {
+        text-align: center;
+        font-size: 10.5pt;
+        margin-bottom: 5px;
+      }
+      .resume-container hr {
+        border: none;
+        border-top: 1px solid #444;
+        margin: 15px 0;
+      }
+      .resume-container h2 {
+        font-size: 13pt;
+        margin-top: 20px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 3px;
+      }
+      .resume-container .job-title {
+        font-weight: bold;
+      }
+      .resume-container .date {
+        float: right;
+        font-style: italic;
+      }
+      .resume-container ul {
+        margin: 4px 0 10px 20px;
+      }
+      .resume-container li {
+        margin-bottom: 4px;
+      }
+
+      /* Editor Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+      }
+
+      .editor-header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .editor-controls {
+        background-color: #34495e;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 0 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #2980b9;
+      }
+
+      .btn.edit-mode {
+        background-color: #e74c3c;
+      }
+
+      .btn.edit-mode:hover {
+        background-color: #c0392b;
+      }
+
+      .btn.save {
+        background-color: #27ae60;
+      }
+
+      .btn.save:hover {
+        background-color: #229954;
+      }
+
+      /* Editable content styles */
+      .editable {
+        outline: none;
+        transition: all 0.3s ease;
+      }
+
+      .editable:hover {
+        background-color: #f8f9fa;
+      }
+
+      .editable:focus {
+        background-color: #fff3cd;
+        border: 2px dashed #ffc107;
+        padding: 2px;
+      }
+
+      .edit-mode-active .editable {
+        background-color: #e8f4fd;
+        border: 1px dashed #3498db;
+        padding: 2px;
+      }
+
+      .status-bar {
+        background-color: #95a5a6;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Print styles */
+      @media print {
+        .editor-header,
+        .editor-controls,
+        .status-bar {
+          display: none;
+        }
+        .resume-container {
+          box-shadow: none;
+          margin: 0;
+          padding: 20px;
+        }
+      }
+
+      /* PDF generation styles */
+      .pdf-generation .resume-container {
+        box-shadow: none;
+        margin: 0;
+        padding: 30px;
+        background: white;
+        page-break-inside: avoid;
+      }
+
+      .pdf-generation .editable {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+      }
+    </style>
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  </head>
+  <body>
+    <div class="editor-header">
+      <h1>Resume Content Editor</h1>
+      <p>
+        Click on any text in the resume to edit it. The format will remain
+        unchanged.
+      </p>
+    </div>
+
+    <div class="editor-controls">
+      <button class="btn" id="editModeBtn" onclick="toggleEditMode()">
+        Enable Edit Mode
+      </button>
+      <button class="btn save" onclick="saveChanges()">Save Changes</button>
+      <button class="btn" onclick="loadChanges()">Load Saved</button>
+      <button class="btn" onclick="resetToDefault()">Reset to Default</button>
+      <button class="btn" onclick="exportResume()">Export as HTML</button>
+      <button class="btn" onclick="generatePDF()">Download PDF</button>
+    </div>
+
+    <div class="resume-container" id="resumeContainer">
+      <!-- Header -->
+      <h1 class="editable" data-field="name">Anubhav Choubey</h1>
+      <div class="contact editable" data-field="contact">
+        +91 9131XXXXXX | choubey.anubhav253@gmail.com | anubhavchoubey.com
+      </div>
+      <div class="links editable" data-field="links">
+        GitHub | LinkedIn | Kaggle | Jabalpur, Madhya Pradesh
+      </div>
+      <hr />
+
+      <!-- Experience -->
+      <h2>Experience</h2>
+
+      <p>
+        <span class="job-title editable" data-field="job1-title"
+          >Technical Intern @ Rozana.in (Onsite)</span
+        >
+        <span class="date editable" data-field="job1-date"
+          >Jul 2025 – Present</span
+        >
+      </p>
+      <ul>
+        <li class="editable" data-field="job1-desc1">
+          Built a pipeline for automated image generation and editing using SOTA
+          open-source models (Flux Krea Dev, Qwen Image Edit, Vision LLMs).
+        </li>
+        <li class="editable" data-field="job1-desc2">
+          Automated generation of display names, descriptions, and visual tags
+          using Gemini API, and optimized Typesense queries for improved search
+          relevance.
+        </li>
+        <li class="editable" data-field="job1-desc3">
+          Developed a pipeline to fetch, process, and deploy geofencing data for
+          store coverage areas, enabling seamless production integration.
+        </li>
+      </ul>
+
+      <p>
+        <span class="job-title editable" data-field="job2-title"
+          >Deep Learning Intern @ Devnex Technologies</span
+        >
+        <span class="date editable" data-field="job2-date"
+          >Sep 2024 – Jul 2025</span
+        >
+      </p>
+      <ul>
+        <li class="editable" data-field="job2-desc1">
+          Deployed open-source models (Flux, Flux Kontext, InternVL, Gemma,
+          etc.) on HuggingFace Endpoints and Modal.com with quantized versions
+          for efficient remote execution.
+        </li>
+        <li class="editable" data-field="job2-desc2">
+          Optimized model performance by reducing memory usage and runtime
+          through parallel processing, multithreading, and pipelining.
+        </li>
+        <li class="editable" data-field="job2-desc3">
+          Collaborated in professional environments using ticket-based systems,
+          Git workflows, and maintained thorough code documentation.
+        </li>
+      </ul>
+
+      <p>
+        <span class="job-title editable" data-field="job3-title"
+          >Intern @ Lexi.ai</span
+        >
+        <span class="date editable" data-field="job3-date"
+          >May 2024 – Jun 2025</span
+        >
+      </p>
+      <ul>
+        <li class="editable" data-field="job3-desc1">
+          Developed a Django backend with a web-hosted SQL database, including
+          MySQL schema design and robust validation for accurate data
+          transmission.
+        </li>
+        <li class="editable" data-field="job3-desc2">
+          Contributed to website basic frontend development using HTML, CSS, JS
+          (React).
+        </li>
+      </ul>
+
+      <p>
+        <span class="job-title editable" data-field="job4-title"
+          >Freelancer</span
+        >
+        <span class="date editable" data-field="job4-date"
+          >Sep 2023 – Sep 2024</span
+        >
+      </p>
+      <ul>
+        <li class="editable" data-field="job4-desc1">
+          Completed 15+ projects spanning Python, FastAPI, Django, Machine
+          Learning, automation, and various Python frameworks.
+        </li>
+      </ul>
+
+      <!-- Projects -->
+      <h2>Projects</h2>
+
+      <p>
+        <span class="job-title editable" data-field="project1-title"
+          >School Sphere – School Management System</span
+        >
+        <span class="date editable" data-field="project1-tech"
+          >(Python, FastAPI, Celery, Redis, JWT)</span
+        >
+      </p>
+      <ul>
+        <li class="editable" data-field="project1-desc1">
+          Engineered a secure backend with JWT-based authentication and
+          multi-role access control, ensuring safe request handling and granular
+          read/write permissions.
+        </li>
+        <li class="editable" data-field="project1-desc2">
+          Optimized performance using Redis-based class-level caching, Celery
+          for task scheduling, and multithreading to reduce redundant processing
+          and improve scalability.
+        </li>
+        <li class="editable" data-field="project1-desc3">
+          Followed industry best practices (logging, lazy loading, exception
+          handling) while building with Python, FastAPI, Redis, Celery, and JWT
+          for a production-ready system.
+        </li>
+      </ul>
+
+      <p>
+        <span class="job-title editable" data-field="project2-title"
+          >Gesture Controlled Virtual Assistant</span
+        >
+        <span class="date editable" data-field="project2-tech"
+          >(OpenCV, Python, MediaPipe, NumPy)</span
+        >
+      </p>
+      <ul>
+        <li class="editable" data-field="project2-desc1">
+          Created a virtual assistant that uses gesture control for hands-free
+          computer interaction.
+        </li>
+        <li class="editable" data-field="project2-desc2">
+          Incorporated facial and hand filters to enhance the representation of
+          the subject.
+        </li>
+      </ul>
+
+      <p>
+        <span class="job-title editable" data-field="project3-title"
+          >Chess AI</span
+        >
+        <span class="date editable" data-field="project3-tech"
+          >(Python, PyGame, Minimax Algorithm, AI, Parallel Programming)</span
+        >
+      </p>
+      <ul>
+        <li class="editable" data-field="project3-desc1">
+          Built a Chess game with an AI opponent (~1000 ELO) using Python,
+          PyGame, and the Minimax algorithm.
+        </li>
+        <li class="editable" data-field="project3-desc2">
+          Optimized AI performance with parallel processing, multithreading, and
+          best coding practices.
+        </li>
+      </ul>
+
+      <!-- Skills -->
+      <h2>Skills</h2>
+      <p class="editable" data-field="skills-languages">
+        <b>Languages & Frameworks:</b> Python, Django, FastAPI, SQL
+      </p>
+      <p class="editable" data-field="skills-ai">
+        <b>AI/ML & Deep Learning:</b> Prompting, ComfyUI, Pipelining,
+        HuggingFace, CV, NLP, OpenCV, Inferencing
+      </p>
+      <p class="editable" data-field="skills-data">
+        <b>Data Handling:</b> MySQL, SQLAlchemy, Pandas, NumPy, BeautifulSoup4,
+        Firebase, REST APIs, Webhooks
+      </p>
+      <p class="editable" data-field="skills-cloud">
+        <b>Cloud & Deployment:</b> HuggingFace Endpoints, AWS, Linux, Docker
+      </p>
+      <p class="editable" data-field="skills-tools">
+        <b>Tools & Automation:</b> Selenium, Git, GitHub
+      </p>
+
+      <!-- Education -->
+      <h2>Education</h2>
+      <p class="editable" data-field="education-btech">
+        <b>B.Tech (Artificial Intelligence and Data Science):</b> JEC (Est.
+        1947) – 8.4* <span class="date">Jul 2022 – Apr 2026</span>
+      </p>
+      <p class="editable" data-field="education-cbse">
+        <b>CBSE (Senior Secondary Education):</b> KVOFK – 92.2%
+        <span class="date">Apr 2021 – Jul 2022</span>
+      </p>
+
+      <!-- Accomplishments -->
+      <h2>Accomplishments</h2>
+      <ul>
+        <li class="editable" data-field="accomplish1">
+          Led 'Team Conquerors!' to SIH'24 Finals.
+        </li>
+        <li class="editable" data-field="accomplish2">
+          LeetCode: Solved 200+ problems in Data Structures and Algorithms.
+        </li>
+        <li class="editable" data-field="accomplish3">
+          Led the winning team at CodeKumbh Hackathon, showcasing leadership and
+          teamwork skills.
+        </li>
+        <li class="editable" data-field="accomplish4">
+          Team leader for a Top 4 project at the HackCrux Hackathon.
+        </li>
+        <li class="editable" data-field="accomplish5">
+          Built and manage a coding-focused YouTube channel with 9K+ subscribers
+          and 2.5M+ total views.
+        </li>
+        <li class="editable" data-field="accomplish6">
+          Certifications: Python, AI, ML, Technical Support Fundamentals
+          (Coursera).
+        </li>
+      </ul>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+      Ready to edit. Click "Enable Edit Mode" to start editing content.
+    </div>
+
+    <script>
+      let editMode = false;
+      let originalContent = {};
+
+      // Store original content
+      function storeOriginalContent() {
+        const editableElements = document.querySelectorAll(".editable");
+        editableElements.forEach((element) => {
+          const field = element.getAttribute("data-field");
+          originalContent[field] = element.innerHTML;
+        });
+      }
+
+      // Toggle edit mode
+      function toggleEditMode() {
+        editMode = !editMode;
+        const container = document.getElementById("resumeContainer");
+        const btn = document.getElementById("editModeBtn");
+        const statusBar = document.getElementById("statusBar");
+
+        if (editMode) {
+          container.classList.add("edit-mode-active");
+          btn.textContent = "Disable Edit Mode";
+          btn.classList.add("edit-mode");
+          enableEditing();
+          statusBar.textContent =
+            "Edit Mode: ON - Click on any text to edit it.";
+        } else {
+          container.classList.remove("edit-mode-active");
+          btn.textContent = "Enable Edit Mode";
+          btn.classList.remove("edit-mode");
+          disableEditing();
+          statusBar.textContent =
+            'Edit Mode: OFF - Click "Enable Edit Mode" to edit content.';
+        }
+      }
+
+      // Enable editing
+      function enableEditing() {
+        const editableElements = document.querySelectorAll(".editable");
+        editableElements.forEach((element) => {
+          element.contentEditable = true;
+          element.addEventListener("focus", onElementFocus);
+          element.addEventListener("blur", onElementBlur);
+        });
+      }
+
+      // Disable editing
+      function disableEditing() {
+        const editableElements = document.querySelectorAll(".editable");
+        editableElements.forEach((element) => {
+          element.contentEditable = false;
+          element.removeEventListener("focus", onElementFocus);
+          element.removeEventListener("blur", onElementBlur);
+        });
+      }
+
+      // Handle element focus
+      function onElementFocus(event) {
+        const statusBar = document.getElementById("statusBar");
+        const field = event.target.getAttribute("data-field");
+        statusBar.textContent = `Editing: ${field}`;
+      }
+
+      // Handle element blur
+      function onElementBlur(event) {
+        const statusBar = document.getElementById("statusBar");
+        statusBar.textContent = "Edit Mode: ON - Click on any text to edit it.";
+      }
+
+      // Save changes to localStorage
+      function saveChanges() {
+        const editableElements = document.querySelectorAll(".editable");
+        const data = {};
+
+        editableElements.forEach((element) => {
+          const field = element.getAttribute("data-field");
+          data[field] = element.innerHTML;
+        });
+
+        localStorage.setItem("resumeData", JSON.stringify(data));
+
+        const statusBar = document.getElementById("statusBar");
+        statusBar.textContent = "Changes saved successfully!";
+        setTimeout(() => {
+          statusBar.textContent = editMode
+            ? "Edit Mode: ON - Click on any text to edit it."
+            : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+        }, 2000);
+      }
+
+      // Load changes from localStorage
+      function loadChanges() {
+        const savedData = localStorage.getItem("resumeData");
+        if (savedData) {
+          const data = JSON.parse(savedData);
+
+          Object.keys(data).forEach((field) => {
+            const element = document.querySelector(`[data-field="${field}"]`);
+            if (element) {
+              element.innerHTML = data[field];
+            }
+          });
+
+          const statusBar = document.getElementById("statusBar");
+          statusBar.textContent = "Saved changes loaded successfully!";
+          setTimeout(() => {
+            statusBar.textContent = editMode
+              ? "Edit Mode: ON - Click on any text to edit it."
+              : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+          }, 2000);
+        } else {
+          alert("No saved changes found.");
+        }
+      }
+
+      // Reset to default content
+      function resetToDefault() {
+        if (confirm("Are you sure you want to reset all content to default?")) {
+          Object.keys(originalContent).forEach((field) => {
+            const element = document.querySelector(`[data-field="${field}"]`);
+            if (element) {
+              element.innerHTML = originalContent[field];
+            }
+          });
+
+          const statusBar = document.getElementById("statusBar");
+          statusBar.textContent = "Content reset to default!";
+          setTimeout(() => {
+            statusBar.textContent = editMode
+              ? "Edit Mode: ON - Click on any text to edit it."
+              : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+          }, 2000);
+        }
+      }
+
+      // Export resume as HTML
+      function exportResume() {
+        const resumeContainer = document.getElementById("resumeContainer");
+        const originalHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Anubhav Choubey - Resume</title>
+  <style>
+    body {
+      font-family: "Calibri", sans-serif;
+      margin: 40px;
+      font-size: 12pt;
+      color: #111;
+    }
+    h1 {
+      text-align: center;
+      font-size: 22pt;
+      margin-bottom: 5px;
+    }
+    .contact, .links {
+      text-align: center;
+      font-size: 10.5pt;
+      margin-bottom: 5px;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 15px 0;
+    }
+    h2 {
+      font-size: 13pt;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 3px;
+    }
+    .job-title {
+      font-weight: bold;
+    }
+    .date {
+      float: right;
+      font-style: italic;
+    }
+    ul {
+      margin: 4px 0 10px 20px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+${resumeContainer.innerHTML
+  .replace(/class="[^"]*editable[^"]*"/g, "")
+  .replace(/data-field="[^"]*"/g, "")
+  .replace(/contenteditable="[^"]*"/g, "")}
+</body>
+</html>`;
+
+        const blob = new Blob([originalHTML], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "resume.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        const statusBar = document.getElementById("statusBar");
+        statusBar.textContent = "Resume exported as HTML file!";
+        setTimeout(() => {
+          statusBar.textContent = editMode
+            ? "Edit Mode: ON - Click on any text to edit it."
+            : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+        }, 2000);
+      }
+
+      // Generate PDF using html2pdf.js
+      function generatePDF() {
+        const element = document.getElementById("resumeContainer");
+        const statusBar = document.getElementById("statusBar");
+
+        // Show loading message
+        statusBar.textContent = "Generating PDF... Please wait.";
+
+        // Clone the element to avoid modifying the original
+        const clonedElement = element.cloneNode(true);
+
+        // Remove all editable classes and attributes from the cloned element
+        const editableElements = clonedElement.querySelectorAll(".editable");
+        editableElements.forEach((el) => {
+          el.classList.remove("editable");
+          el.removeAttribute("contenteditable");
+          el.removeAttribute("data-field");
+        });
+
+        // Remove edit mode styling
+        clonedElement.classList.remove("edit-mode-active");
+
+        // Configure html2pdf options
+        const opt = {
+          margin: [0.5, 0.5, 0.5, 0.5], // top, left, bottom, right in inches
+          filename: "Resume_Anubhav_Choubey.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            letterRendering: true,
+          },
+          jsPDF: {
+            unit: "in",
+            format: "a4",
+            orientation: "portrait",
+          },
+        };
+
+        // Generate PDF
+        html2pdf()
+          .set(opt)
+          .from(clonedElement)
+          .save()
+          .then(() => {
+            statusBar.textContent = "PDF generated successfully!";
+            setTimeout(() => {
+              statusBar.textContent = editMode
+                ? "Edit Mode: ON - Click on any text to edit it."
+                : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+            }, 3000);
+          })
+          .catch((error) => {
+            console.error("Error generating PDF:", error);
+            statusBar.textContent = "Error generating PDF. Please try again.";
+            setTimeout(() => {
+              statusBar.textContent = editMode
+                ? "Edit Mode: ON - Click on any text to edit it."
+                : 'Ready to edit. Click "Enable Edit Mode" to start editing content.';
+            }, 3000);
+          });
+      }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        storeOriginalContent();
+      });
+    </script>
+  </body>
+</html>
