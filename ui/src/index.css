@@ -46,24 +46,6 @@
   }
 }
 
-@layer utilities {
-  .text-12pt {
-    font-size: 12pt;
-  }
-
-  .text-13pt {
-    font-size: 13pt;
-  }
-
-  .text-22pt {
-    font-size: 22pt;
-  }
-
-  .text-10-5pt {
-    font-size: 10.5pt;
-  }
-}
-
 @media print {
   .sidebar,
   .status-bar {

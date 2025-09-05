@@ -11,6 +11,7 @@ module.exports = {
         "13pt": "13pt",
         "22pt": "22pt",
         "10.5pt": "10.5pt",
+        "10-5pt": "10.5pt",
       },
       width: {
         a4: "794px",
@@ -18,8 +19,14 @@ module.exports = {
       height: {
         a4: "1123px",
       },
+      minHeight: {
+        a4: "1123px",
+      },
       padding: {
         a4: "76px",
+      },
+      margin: {
+        "a4-margin": "20px",
       },
       spacing: {
         "a4-margin": "20px",
