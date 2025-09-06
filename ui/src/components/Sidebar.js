@@ -1,13 +1,11 @@
 import React from "react";
-import { Edit3, Save, RotateCcw, Download, Sparkles } from "lucide-react";
+import { Edit3, Download, Sparkles } from "lucide-react";
 
 const Sidebar = ({
   editMode,
   jobDescription,
   onJobDescriptionChange,
   onToggleEditMode,
-  onSaveChanges,
-  onResetToDefault,
   onGeneratePDF,
   onUpdateWithAI,
 }) => {
@@ -30,27 +28,10 @@ const Sidebar = ({
         />
       </div>
 
-      {/* AI Section */}
-      <div className="mb-5">
-        <h3 className="mt-0 mb-4 text-base text-gray-200 border-b border-slate-700 pb-1">
-          AI Assistant
-        </h3>
+      {/* Core Features */}
+      <div className="space-y-3">
         <button
-          className="bg-purple-600 hover:bg-purple-700 text-white border-none py-3 px-4 my-1 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2"
-          onClick={onUpdateWithAI}
-        >
-          <Sparkles size={16} />
-          Update with AI for Job Description
-        </button>
-      </div>
-
-      {/* Edit Controls Section */}
-      <div className="mb-5">
-        <h3 className="mt-0 mb-4 text-base text-gray-200 border-b border-slate-700 pb-1">
-          Edit Controls
-        </h3>
-        <button
-          className={`border-none py-3 px-4 my-1 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2 ${
+          className={`border-none py-3 px-4 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2 ${
             editMode
               ? "bg-red-600 hover:bg-red-700 text-white"
               : "bg-blue-600 hover:bg-blue-700 text-white"
@@ -60,33 +41,21 @@ const Sidebar = ({
           <Edit3 size={16} />
           {editMode ? "Disable Edit Mode" : "Enable Edit Mode"}
         </button>
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white border-none py-3 px-4 my-1 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2"
-          onClick={onSaveChanges}
-        >
-          <Save size={16} />
-          Save Changes
-        </button>
-        <button
-          className="bg-orange-500 hover:bg-orange-600 text-white border-none py-3 px-4 my-1 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2"
-          onClick={onResetToDefault}
-        >
-          <RotateCcw size={16} />
-          Reset to Default
-        </button>
-      </div>
 
-      {/* Export Options Section */}
-      <div className="mb-5">
-        <h3 className="mt-0 mb-4 text-base text-gray-200 border-b border-slate-700 pb-1">
-          Export Options
-        </h3>
         <button
-          className="bg-blue-600 hover:bg-blue-700 text-white border-none py-3 px-4 my-1 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white border-none py-3 px-4 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2"
           onClick={onGeneratePDF}
         >
           <Download size={16} />
           Download PDF
+        </button>
+
+        <button
+          className="bg-purple-600 hover:bg-purple-700 text-white border-none py-3 px-4 rounded-md cursor-pointer text-sm transition-colors duration-300 w-full text-center flex items-center justify-center gap-2"
+          onClick={onUpdateWithAI}
+        >
+          <Sparkles size={16} />
+          Update with AI for JD
         </button>
       </div>
     </div>

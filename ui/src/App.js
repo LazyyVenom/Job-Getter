@@ -7,65 +7,13 @@ import { useEditMode } from "./hooks/useEditMode";
 import { generatePDF } from "./utils/pdfGenerator";
 
 function App() {
-  const { resumeData, updateField, saveData, loadData, resetData } =
-    useResumeData();
+  const { resumeData, updateField } = useResumeData();
   const { editMode, toggleEditMode } = useEditMode();
   const [statusMessage, setStatusMessage] = useState(
     'Ready to edit. Click "Enable Edit Mode" to start editing content.'
   );
   const [jobDescription, setJobDescription] = useState("");
   const resumeRef = useRef(null);
-
-  const handleSaveChanges = useCallback(() => {
-    saveData();
-    setStatusMessage("Changes saved successfully!");
-    setTimeout(() => {
-      setStatusMessage(
-        editMode
-          ? "Edit Mode: ON - Click on any text to edit it."
-          : 'Ready to edit. Click "Enable Edit Mode" to start editing content.'
-      );
-    }, 2000);
-  }, [saveData, editMode]);
-
-  const handleLoadChanges = useCallback(() => {
-    const loaded = loadData();
-    if (loaded) {
-      setStatusMessage("Saved changes loaded successfully!");
-      setTimeout(() => {
-        setStatusMessage(
-          editMode
-            ? "Edit Mode: ON - Click on any text to edit it."
-            : 'Ready to edit. Click "Enable Edit Mode" to start editing content.'
-        );
-      }, 2000);
-    } else {
-      setStatusMessage("No saved changes found.");
-      setTimeout(() => {
-        setStatusMessage(
-          editMode
-            ? "Edit Mode: ON - Click on any text to edit it."
-            : 'Ready to edit. Click "Enable Edit Mode" to start editing content.'
-        );
-      }, 2000);
-    }
-  }, [loadData, editMode]);
-
-  const handleResetToDefault = useCallback(() => {
-    if (
-      window.confirm("Are you sure you want to reset all content to default?")
-    ) {
-      resetData();
-      setStatusMessage("Content reset to default!");
-      setTimeout(() => {
-        setStatusMessage(
-          editMode
-            ? "Edit Mode: ON - Click on any text to edit it."
-            : 'Ready to edit. Click "Enable Edit Mode" to start editing content.'
-        );
-      }, 2000);
-    }
-  }, [resetData, editMode]);
 
   const handleGeneratePDF = useCallback(async () => {
     if (!resumeRef.current) return;
@@ -146,8 +94,12 @@ function App() {
   }, []);
 
   const handleFieldBlur = useCallback(() => {
-    setStatusMessage("Edit Mode: ON - Click on any text to edit it.");
-  }, []);
+    setStatusMessage(
+      editMode
+        ? "Edit Mode: ON - Click on any text to edit it."
+        : 'Ready to edit. Click "Enable Edit Mode" to start editing content.'
+    );
+  }, [editMode]);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -156,9 +108,6 @@ function App() {
         jobDescription={jobDescription}
         onJobDescriptionChange={setJobDescription}
         onToggleEditMode={handleToggleEditMode}
-        onSaveChanges={handleSaveChanges}
-        onLoadChanges={handleLoadChanges}
-        onResetToDefault={handleResetToDefault}
         onGeneratePDF={handleGeneratePDF}
         onUpdateWithAI={handleUpdateWithAI}
       />

@@ -11,8 +11,10 @@ const ResumeContainer = forwardRef(
           <EditableField
             tag="h1"
             field="name"
-            value={resumeData.name}
-            onUpdate={onUpdateField}
+            value={resumeData.personalInfo?.name}
+            onUpdate={(field, value) =>
+              onUpdateField("personalInfo", field, value)
+            }
             onFocus={onFieldFocus}
             onBlur={onFieldBlur}
             editMode={editMode}
@@ -22,8 +24,10 @@ const ResumeContainer = forwardRef(
           <EditableField
             tag="div"
             field="contact"
-            value={resumeData.contact}
-            onUpdate={onUpdateField}
+            value={resumeData.personalInfo?.contact}
+            onUpdate={(field, value) =>
+              onUpdateField("personalInfo", field, value)
+            }
             onFocus={onFieldFocus}
             onBlur={onFieldBlur}
             editMode={editMode}
@@ -33,8 +37,10 @@ const ResumeContainer = forwardRef(
           <EditableField
             tag="div"
             field="links"
-            value={resumeData.links}
-            onUpdate={onUpdateField}
+            value={resumeData.personalInfo?.links}
+            onUpdate={(field, value) =>
+              onUpdateField("personalInfo", field, value)
+            }
             onFocus={onFieldFocus}
             onBlur={onFieldBlur}
             editMode={editMode}
@@ -48,119 +54,60 @@ const ResumeContainer = forwardRef(
             Experience
           </h2>
 
-          <div className="no-break">
-            <p className="my-2 leading-relaxed">
-              <EditableField
-                tag="span"
-                field="job1-title"
-                value={resumeData["job1-title"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="font-bold"
-              />
-              <EditableField
-                tag="span"
-                field="job1-date"
-                value={resumeData["job1-date"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="float-right italic"
-              />
-            </p>
-            <ul className="my-1 ml-5">
-              <EditableField
-                tag="li"
-                field="job1-desc1"
-                value={resumeData["job1-desc1"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-              <EditableField
-                tag="li"
-                field="job1-desc2"
-                value={resumeData["job1-desc2"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-              <EditableField
-                tag="li"
-                field="job1-desc3"
-                value={resumeData["job1-desc3"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-            </ul>
-          </div>
-
-          <div className="no-break">
-            <p className="my-2 leading-relaxed">
-              <EditableField
-                tag="span"
-                field="job2-title"
-                value={resumeData["job2-title"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="font-bold"
-              />
-              <EditableField
-                tag="span"
-                field="job2-date"
-                value={resumeData["job2-date"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="float-right italic"
-              />
-            </p>
-            <ul className="my-1 ml-5">
-              <EditableField
-                tag="li"
-                field="job2-desc1"
-                value={resumeData["job2-desc1"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-              <EditableField
-                tag="li"
-                field="job2-desc2"
-                value={resumeData["job2-desc2"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-              <EditableField
-                tag="li"
-                field="job2-desc3"
-                value={resumeData["job2-desc3"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-            </ul>
-          </div>
+          {resumeData.experience?.slice(0, 2).map((job, index) => (
+            <div key={job.id} className="no-break">
+              <p className="my-2 leading-relaxed">
+                <EditableField
+                  tag="span"
+                  field="title"
+                  value={job.title}
+                  onUpdate={(field, value) =>
+                    onUpdateField("experience", field, value, index)
+                  }
+                  onFocus={onFieldFocus}
+                  onBlur={onFieldBlur}
+                  editMode={editMode}
+                  className="font-bold"
+                />
+                <EditableField
+                  tag="span"
+                  field="date"
+                  value={job.date}
+                  onUpdate={(field, value) =>
+                    onUpdateField("experience", field, value, index)
+                  }
+                  onFocus={onFieldFocus}
+                  onBlur={onFieldBlur}
+                  editMode={editMode}
+                  className="float-right italic"
+                />
+              </p>
+              <ul className="my-1 ml-5">
+                {job.descriptions?.map((desc, descIndex) => (
+                  <EditableField
+                    key={descIndex}
+                    tag="li"
+                    field={`description-${descIndex}`}
+                    value={desc}
+                    onUpdate={(field, value) => {
+                      const newDescriptions = [...job.descriptions];
+                      newDescriptions[descIndex] = value;
+                      onUpdateField(
+                        "experience",
+                        "descriptions",
+                        newDescriptions,
+                        index
+                      );
+                    }}
+                    onFocus={onFieldFocus}
+                    onBlur={onFieldBlur}
+                    editMode={editMode}
+                    className="mb-1 leading-relaxed"
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
         {/* Page 2 */}
@@ -172,151 +119,120 @@ const ResumeContainer = forwardRef(
             Experience (Continued)
           </h2>
 
-          <div className="no-break">
-            <p className="my-2 leading-relaxed">
-              <EditableField
-                tag="span"
-                field="job3-title"
-                value={resumeData["job3-title"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="font-bold"
-              />
-              <EditableField
-                tag="span"
-                field="job3-date"
-                value={resumeData["job3-date"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="float-right italic"
-              />
-            </p>
-            <ul className="my-1 ml-5">
-              <EditableField
-                tag="li"
-                field="job3-desc1"
-                value={resumeData["job3-desc1"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-              <EditableField
-                tag="li"
-                field="job3-desc2"
-                value={resumeData["job3-desc2"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-            </ul>
-          </div>
-
-          <div className="no-break">
-            <p className="my-2 leading-relaxed">
-              <EditableField
-                tag="span"
-                field="job4-title"
-                value={resumeData["job4-title"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="font-bold"
-              />
-              <EditableField
-                tag="span"
-                field="job4-date"
-                value={resumeData["job4-date"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="float-right italic"
-              />
-            </p>
-            <ul className="my-1 ml-5">
-              <EditableField
-                tag="li"
-                field="job4-desc1"
-                value={resumeData["job4-desc1"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-            </ul>
-          </div>
+          {resumeData.experience?.slice(2).map((job, index) => (
+            <div key={job.id} className="no-break">
+              <p className="my-2 leading-relaxed">
+                <EditableField
+                  tag="span"
+                  field="title"
+                  value={job.title}
+                  onUpdate={(field, value) =>
+                    onUpdateField("experience", field, value, index + 2)
+                  }
+                  onFocus={onFieldFocus}
+                  onBlur={onFieldBlur}
+                  editMode={editMode}
+                  className="font-bold"
+                />
+                <EditableField
+                  tag="span"
+                  field="date"
+                  value={job.date}
+                  onUpdate={(field, value) =>
+                    onUpdateField("experience", field, value, index + 2)
+                  }
+                  onFocus={onFieldFocus}
+                  onBlur={onFieldBlur}
+                  editMode={editMode}
+                  className="float-right italic"
+                />
+              </p>
+              <ul className="my-1 ml-5">
+                {job.descriptions?.map((desc, descIndex) => (
+                  <EditableField
+                    key={descIndex}
+                    tag="li"
+                    field={`description-${descIndex}`}
+                    value={desc}
+                    onUpdate={(field, value) => {
+                      const newDescriptions = [...job.descriptions];
+                      newDescriptions[descIndex] = value;
+                      onUpdateField(
+                        "experience",
+                        "descriptions",
+                        newDescriptions,
+                        index + 2
+                      );
+                    }}
+                    onFocus={onFieldFocus}
+                    onBlur={onFieldBlur}
+                    editMode={editMode}
+                    className="mb-1 leading-relaxed"
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
 
           {/* Projects */}
           <h2 className="text-13pt mt-4 mb-2 border-b border-gray-300 pb-1">
             Projects
           </h2>
 
-          <div className="no-break">
-            <p className="my-2 leading-relaxed">
-              <EditableField
-                tag="span"
-                field="project1-title"
-                value={resumeData["project1-title"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="font-bold"
-              />
-              <EditableField
-                tag="span"
-                field="project1-tech"
-                value={resumeData["project1-tech"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="float-right italic"
-              />
-            </p>
-            <ul className="my-1 ml-5">
-              <EditableField
-                tag="li"
-                field="project1-desc1"
-                value={resumeData["project1-desc1"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-              <EditableField
-                tag="li"
-                field="project1-desc2"
-                value={resumeData["project1-desc2"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-              <EditableField
-                tag="li"
-                field="project1-desc3"
-                value={resumeData["project1-desc3"]}
-                onUpdate={onUpdateField}
-                onFocus={onFieldFocus}
-                onBlur={onFieldBlur}
-                editMode={editMode}
-                className="mb-1 leading-relaxed"
-              />
-            </ul>
-          </div>
+          {resumeData.projects?.map((project, index) => (
+            <div key={project.id} className="no-break">
+              <p className="my-2 leading-relaxed">
+                <EditableField
+                  tag="span"
+                  field="title"
+                  value={project.title}
+                  onUpdate={(field, value) =>
+                    onUpdateField("projects", field, value, index)
+                  }
+                  onFocus={onFieldFocus}
+                  onBlur={onFieldBlur}
+                  editMode={editMode}
+                  className="font-bold"
+                />
+                <EditableField
+                  tag="span"
+                  field="technologies"
+                  value={project.technologies}
+                  onUpdate={(field, value) =>
+                    onUpdateField("projects", field, value, index)
+                  }
+                  onFocus={onFieldFocus}
+                  onBlur={onFieldBlur}
+                  editMode={editMode}
+                  className="float-right italic"
+                />
+              </p>
+              <ul className="my-1 ml-5">
+                {project.descriptions?.map((desc, descIndex) => (
+                  <EditableField
+                    key={descIndex}
+                    tag="li"
+                    field={`description-${descIndex}`}
+                    value={desc}
+                    onUpdate={(field, value) => {
+                      const newDescriptions = [...project.descriptions];
+                      newDescriptions[descIndex] = value;
+                      onUpdateField(
+                        "projects",
+                        "descriptions",
+                        newDescriptions,
+                        index
+                      );
+                    }}
+                    onFocus={onFieldFocus}
+                    onBlur={onFieldBlur}
+                    editMode={editMode}
+                    className="mb-1 leading-relaxed"
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
 
           {/* Skills */}
           <h2 className="text-13pt mt-4 mb-2 border-b border-gray-300 pb-1">
@@ -324,9 +240,9 @@ const ResumeContainer = forwardRef(
           </h2>
           <EditableField
             tag="p"
-            field="skills-languages"
-            value={resumeData["skills-languages"]}
-            onUpdate={onUpdateField}
+            field="languages"
+            value={resumeData.skills?.languages}
+            onUpdate={(field, value) => onUpdateField("skills", field, value)}
             onFocus={onFieldFocus}
             onBlur={onFieldBlur}
             editMode={editMode}
@@ -334,9 +250,9 @@ const ResumeContainer = forwardRef(
           />
           <EditableField
             tag="p"
-            field="skills-ai"
-            value={resumeData["skills-ai"]}
-            onUpdate={onUpdateField}
+            field="ai"
+            value={resumeData.skills?.ai}
+            onUpdate={(field, value) => onUpdateField("skills", field, value)}
             onFocus={onFieldFocus}
             onBlur={onFieldBlur}
             editMode={editMode}
@@ -349,9 +265,11 @@ const ResumeContainer = forwardRef(
           </h2>
           <EditableField
             tag="p"
-            field="education-btech"
-            value={resumeData["education-btech"]}
-            onUpdate={onUpdateField}
+            field="btech"
+            value={resumeData.education?.btech}
+            onUpdate={(field, value) =>
+              onUpdateField("education", field, value)
+            }
             onFocus={onFieldFocus}
             onBlur={onFieldBlur}
             editMode={editMode}
@@ -363,26 +281,23 @@ const ResumeContainer = forwardRef(
             Accomplishments
           </h2>
           <ul className="my-1 ml-5">
-            <EditableField
-              tag="li"
-              field="accomplish1"
-              value={resumeData.accomplish1}
-              onUpdate={onUpdateField}
-              onFocus={onFieldFocus}
-              onBlur={onFieldBlur}
-              editMode={editMode}
-              className="mb-1 leading-relaxed"
-            />
-            <EditableField
-              tag="li"
-              field="accomplish2"
-              value={resumeData.accomplish2}
-              onUpdate={onUpdateField}
-              onFocus={onFieldFocus}
-              onBlur={onFieldBlur}
-              editMode={editMode}
-              className="mb-1 leading-relaxed"
-            />
+            {resumeData.accomplishments?.map((accomplishment, index) => (
+              <EditableField
+                key={index}
+                tag="li"
+                field={`accomplishment-${index}`}
+                value={accomplishment}
+                onUpdate={(field, value) => {
+                  const newAccomplishments = [...resumeData.accomplishments];
+                  newAccomplishments[index] = value;
+                  onUpdateField("accomplishments", null, newAccomplishments);
+                }}
+                onFocus={onFieldFocus}
+                onBlur={onFieldBlur}
+                editMode={editMode}
+                className="mb-1 leading-relaxed"
+              />
+            ))}
           </ul>
         </div>
       </div>
